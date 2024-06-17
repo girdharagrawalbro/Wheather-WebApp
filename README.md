@@ -28,3 +28,20 @@ Make sure you have a modern web browser installed.
 1. Clone the repo
    ```sh
    https://github.com/girdharagrawalbro/Wheather-WebApp.git
+
+2. Open the index.html file in your browser to view the website.
+
+##Usage
+1. Open the website.
+2. Use the search bar to enter the name of a city.
+3. View the current weather information for the entered city.
+
+##API Integration
+This website uses the OpenWeatherMap API to fetch weather data. To use this API, you need to sign up for an API key.
+
+1. Sign up at OpenWeatherMap.
+2. Replace YOUR_API_KEY in the JavaScript file with your API key.
+
+## Acknowledgements
+- OpenWeatherMap for the weather data API.
+- Bootstrap for the responsive design framework.
