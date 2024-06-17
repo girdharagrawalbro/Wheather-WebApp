@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Weather Forecast</title>
+</head>
+<style>
+    .text-muted {
+        color: lightgray;
+    }
+</style>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Weather Forecast App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="map.html">Maps</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Filters
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Night</a></li>
+                            <li><a class="dropdown-item" href="#">DayNight</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Show Month Weather</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <form class="d-flex gap-2 align-items-center" role="search" id="searchForm">
+                    <!-- <a class="btn btn-outline-dark" style="width:200px" aria-disabled="true">Dark Mode</a> -->
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchInput">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container-xl">
+        <div class="container my-3" id="today">
+
+        </div>
+        <div class="container mt-4 d-flex gap-2 justify-content-around" id="data"></div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const weekdata = document.getElementById('data');
+        const todaydata = document.getElementById('today');
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const location = searchInput.value.trim();
+            if (location) {
+                localStorage.setItem('location', location);
+                fetchWeather(location);
+            }
+        });
+
+        function fetchWeather(location) {
+            const url = `https://data.api.xweather.com/forecasts/${location}?format=json&filter=day&limit=7&client_id={your api}&client_secret={your api}}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(json => {
+                    if (!json.success) {
+                        // console.log('Data not found');
+                        todaydata.innerHTML += "<h5>No Data Found</h5>";
+
+                    } else {
+                        console.log(json);
+                        weekdata.innerHTML = '';
+                        todaydata.innerHTML = '';
+                        json.response.forEach(item => {
+                            const place = item.place;
+                            const periods = item.periods;
+                            const today = periods[0];
+
+                            const placeName = place.name;
+                            const country = place.country;
+
+                            const dateTimeISO = today.dateTimeISO;
+                            const avgTempC = today.avgTempC;
+                            const avgTempF = today.avgTempF;
+                            const maxTempC = today.maxTempC;
+                            const minTempC = today.minTempC;
+                            const windSpeedKPH = today.windSpeedKPH;
+                            const humidity = today.humidity;
+                            const weather = today.weather;
+                            const weatherPrimary = today.weatherPrimary;
+                            const icon = today.icon;
+
+                            const headHTML = `
+                                <div>
+
+                                    <h3 style="text-transform: capitalize;">
+                                        ${placeName}, <span style="text-transform: uppercase;">${country}</span>
+                                    </h3>
+                                    <p>Updated a few minutes ago</p>
+                                </div>
+                                <div class="d-flex justify-content-around">
+                                    <div>
+                                        <img src="png/${icon}" alt="img" style="width:100px">
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <h1 style="font-size: xxx-large;">${avgTempC} &deg;C</h1>
+                                    </div>
+                                    <div class="text-muted">
+                                        <div>
+                                            <h5>${avgTempC} &deg;C</h5>
+                                        </div>
+                                        <hr>
+                                        <div>
+                                            <h5>${avgTempF} F</h5>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div><h5>${maxTempC} &deg;C</h5></div>
+                                        <hr>
+                                        <div><h5>${minTempC} &deg;C</h5></div>
+                                    </div>
+                                    <div>
+                                        <h6>Wind: ${windSpeedKPH} KMPH</h6>
+                                        <h6>Humidity: ${humidity}%</h6>
+                                    </div>
+                                </div>
+                                <div class="my-2">
+                                    <h5>${weather} &middot; ${new Date(dateTimeISO).toLocaleDateString(undefined, { weekday: 'short' })} ${new Date().toLocaleDateString(undefined, { day: 'numeric' })}, ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' })}</h5>
+                                </div>
+                            `;
+
+                            todaydata.innerHTML += headHTML;
+                            periods.forEach(period => {
+                                const dateTimeISO = period.dateTimeISO;
+                                const maxTempC = period.maxTempC;
+                                const minTempC = period.minTempC;
+
+                                const weatherPrimary = period.weatherPrimary;
+                                const icon = period.icon;
+
+                                const cardHTML = `
+                                    <div class="card text-center p-2" style="width: 18rem;">
+                                        <h5>${new Date(dateTimeISO).toLocaleDateString(undefined, { weekday: 'short' })} ${new Date().toLocaleDateString(undefined, { day: 'numeric' })}</h5>
+                                        <img src="png/${icon}" class="card-img-top" alt="${icon}">
+                                        <div class="card-body">
+                                            <p class="card-text">${weatherPrimary}</p>
+                                            <p class="card-text"> ${maxTempC}°C</p>
+                                            <p class="card-text">${minTempC}°C</p>
+                                        </div>
+                                    </div>`;
+                                weekdata.innerHTML += cardHTML;
+                            });
+
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+        }
+
+        // Fetch weather data from local storage or default location on page load
+        const storedLocation = localStorage.getItem('location');
+        if (storedLocation) {
+            searchInput.value = storedLocation;
+            fetchWeather(storedLocation);
+        } else {
+            fetchWeather(':auto');
+        }
+    });
+</script>
+
+</html>
